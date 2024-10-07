@@ -74,28 +74,28 @@ vpc:
   clusterEndpoints:
     privateAccess: false
     publicAccess: true
-  id: vpc-0e2332e998344b9fc
+  id: vpc-0db13f76ffd134754
   manageSharedNodeSecurityGroupRules: true
   nat:
     gateway: Single
   securityGroup: sg-05577e05cf426744e
   sharedNodeSecurityGroup: sg-0221530a8428624d9
-  subnets:
-    private:
-      ap-south-1a:
-        az: ap-south-1a
-        cidr: 192.168.64.0/19
-        id: subnet-088b54deb7c5a836e
-      ap-south-1b:
-        az: ap-south-1b
-        cidr: 192.168.96.0/19
-        id: subnet-053bc5f0da4c2dac6
-    public:
-      ap-south-1a:
-        az: ap-south-1a
-        cidr: 192.168.0.0/19
-        id: subnet-071457e2c11ce59da
-      ap-south-1b:
-        az: ap-south-1b
-        cidr: 192.168.32.0/19
-        id: subnet-0e518872b714c7102
+  # subnets:
+  #   private:
+  #     ap-south-1a:
+  #       az: ap-south-1a
+  #       cidr: 192.168.64.0/19
+  #       id: subnet-088b54deb7c5a836e
+  #     ap-south-1b:
+  #       az: ap-south-1b
+  #       cidr: 192.168.96.0/19
+  #       id: subnet-053bc5f0da4c2dac6
+  #   public:
+  #     ap-south-1a:
+  #       az: ap-south-1a
+  #       cidr: 192.168.0.0/19
+  #       id: subnet-071457e2c11ce59da
+  #     ap-south-1b:
+  #       az: ap-south-1b
+  #       cidr: 192.168.32.0/19
+  #       id: subnet-0e518872b714c7102
