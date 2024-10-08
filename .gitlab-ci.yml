@@ -8,6 +8,7 @@ before_script:
 stages:
   - build
   - deploy
+  - cluster-ctrl
 
 # Build the Docker image
 build:
@@ -57,7 +58,11 @@ deploy:
     - kubectl apply -f eks-pvc.yaml
     - kubectl apply -f eks-sc-3zones.yaml
 
-
+# cluster-ctrl:
+#   stage: deploy
+#   image: python:3.9-slim
+#   services:
+#     - docker:dind
 
 # deploy:
 #   stage: deploy
