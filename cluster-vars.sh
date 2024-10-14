@@ -1,5 +1,5 @@
 # cluster-vars.sh
-export CLUSTER_NAME="dev-test1"
+export CLUSTER_NAME="dev-test2"
 export NODEGROUP_NAME="spotinstance1"
 export NODE_COUNT=3  # Remove quotes to ensure it's an integer
 export NODE_MAX_SIZE=5  # Remove quotes to ensure it's an integer
