@@ -35,7 +35,7 @@ deploy:
     - curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
     - tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
     - mv /tmp/eksctl /usr/local/bin
-    - eksctl version  # Verify the installed version
+    - eksctl version  # Verify the install
     - export AWSCLI_VERSION=2.11.2
     - export KUBECTL_VERSION=v1.3.0
     - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCLI_VERSION}.zip" -o "awscliv2.zip"
