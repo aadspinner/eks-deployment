@@ -13,9 +13,6 @@ iam:
   withOIDC: true
   vpcResourceControllerPolicy: true
 
-kubernetesNetworkConfig:
-  serviceIPv4CIDR: ${SERVICE_CIDR}
-
 privateCluster:
   enabled: false
   skipEndpointCreation: false
