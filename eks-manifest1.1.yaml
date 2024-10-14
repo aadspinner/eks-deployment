@@ -9,17 +9,6 @@ metadata:
 availabilityZones:
   - ${AVAILABILITY_ZONES}
 
-vpc:
-  id: ${VPC_ID}
-  cidr: ${VPC_CIDR}
-  clusterEndpoints:
-    privateAccess: false
-    publicAccess: true
-  securityGroup: ${SECURITY_GROUP}
-  sharedNodeSecurityGroup: ${SHARED_SECURITY_GROUP}
-  nat:
-    gateway: Single
-
 iam:
   withOIDC: true
   vpcResourceControllerPolicy: true
