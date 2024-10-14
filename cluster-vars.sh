@@ -12,5 +12,4 @@ export SECURITY_GROUP="sg-05577e05cf426744e"
 export SHARED_SECURITY_GROUP="sg-0221530a8428624d9"
 export SERVICE_CIDR="10.100.0.0/16"
 export VPC_CIDR="10.0.0.0/16"
-export AVAILABILITY_ZONES="ap-south-1a,ap-south-1b"
-
+export AVAILABILITY_ZONES=(ap-south-1a ap-south-1b)
