@@ -8,9 +8,7 @@ before_script:
 stages:
   - build
   - deploy
-  - cluster-ctrl
 
-# Build the Docker image
 build:
   stage: build
   script:
@@ -21,13 +19,14 @@ build:
     - changes:
       - Dockerfile
       - src/**/*
-
+      
 deploy:
   stage: deploy
   image: python:3.9-slim
   services:
     - docker:dind
-  before_script:    
+  before_script:
+    - source cluster-vars.sh
     - apt-get update && apt-get install -y curl unzip
     - ARCH=amd64
     - PLATFORM=$(uname -s)_$ARCH
@@ -36,8 +35,6 @@ deploy:
     - tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
     - mv /tmp/eksctl /usr/local/bin
     - eksctl version  # Verify the install
-    - export AWSCLI_VERSION=2.11.2
-    - export KUBECTL_VERSION=v1.3.0
     - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCLI_VERSION}.zip" -o "awscliv2.zip"
     - unzip awscliv2.zip
     - ./aws/install
@@ -45,63 +42,14 @@ deploy:
     - chmod +x kubectl
     - mv kubectl /usr/local/bin/
   script:
-    - eksctl create cluster -f eks-manifest1.1.yaml --without-nodegroup
-    - eksctl update addon --name vpc-cni --cluster dev-test5 --region ap-south-1
-    - eksctl utils associate-iam-oidc-provider --region=ap-south-1 --cluster=dev-test5 --approve
-    - aws eks update-kubeconfig --region ap-south-1 --name dev-test5
-   # - kubectl delete daemonset -n kube-system aws-node
+    - eksctl create cluster --config-file=eks-manifest1.1.yaml
+    - eksctl create nodegroup --config-file=eks-node-grp1.1.yaml
+    - eksctl update addon --name vpc-cni --cluster $CLUSTER_NAME --region $REGION
+    - eksctl utils associate-iam-oidc-provider --region $REGION --cluster $CLUSTER_NAME --approve
+    - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
     - kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.2/manifests/tigera-operator.yaml
     - kubectl apply -f caliconode.yaml
-    - eksctl create nodegroup -f eks-node-grp1.1.yaml
-    - eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster dev-test5 --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve
+    - eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster $CLUSTER_NAME --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve
     - kubectl apply -k 'github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/ecr/?ref=master'
     - kubectl apply -f eks-pvc.yaml
     - kubectl apply -f eks-sc-3zones.yaml
-
-# cluster-ctrl:
-#   stage: deploy
-#   image: python:3.9-slim
-#   services:
-#     - docker:dind
-
-# deploy:
-#   stage: deploy
-#   image: docker:latest
-#   services:
-#     - docker:dind
-#   before_script:    
-#     - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-#   script:
-#     - docker pull ramchdocker/custom-eks-image:latest
-#     - docker run ramchdocker/custom-eks-image:latest eksctl apply -f eks-manifest1.1.yaml --without-nodegroup
-#     - docker run ramchdocker/custom-eks-image:latest eksctl update addon --name vpc-cni --cluster dev-test2 --region ap-south-1
-#     - docker run ramchdocker/custom-eks-image:latest eksctl utils associate-iam-oidc-provider --region=ap-south-1 --cluster=dev-test2 --approve
-#     - docker run ramchdocker/custom-eks-image:latest aws eks update-kubeconfig --region ap-south-1 --name dev-test2
-#     - docker run -v ~/.kube:/root/.kube ramchdocker/custom-eks-image:latest eksctl create nodegroup -f eks-node-grp1.1.yaml
-#     - docker run ramchdocker/custom-eks-image:latest eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster dev-test2 --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve
-#     - docker run ramchdocker/custom-eks-image:latest kubectl apply -k 'github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/ecr/?ref=master'
-#     - docker run ramchdocker/custom-eks-image:latest kubectl apply -f eks-pvc.yaml
-#     - docker run ramchdocker/custom-eks-image:latest kubectl apply -f eks-sc-3zones.yaml
-
-
-# deploy:
-#   stage: deploy
-#   image: docker:latest
-#   services:
-#     - docker:dind
-#   before_script:    
-#     - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-
-#   script:
-#     - docker pull ramchdocker/custom-eks-image:latest
-#     - docker run -v ~/.kube:/root/.kube:ro ramchdocker/custom-eks-image:latest /bin/sh -c "\
-#         eksctl apply -f eks-manifest1.1.yaml --without-nodegroup && \
-#         eksctl update addon --name vpc-cni --cluster dev-test5 --region ap-south-1 && \
-#         eksctl utils associate-iam-oidc-provider --region=ap-south-1 --cluster=dev-test5 --approve && \
-#         aws eks update-kubeconfig --region ap-south-1 --name dev-test5 && \
-#         eksctl create nodegroup -f eks-node-grp1.1.yaml && \
-#         eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster dev-test5 --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve && \
-#         kubectl apply -k 'github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/ecr/?ref=master' && \
-#         kubectl apply -f eks-pvc.yaml && \
-#         kubectl apply -f eks-sc-3zones.yaml \
-#       "
