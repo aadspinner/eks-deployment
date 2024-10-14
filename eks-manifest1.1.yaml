@@ -4,7 +4,7 @@ kind: ClusterConfig
 metadata:
   name: ${CLUSTER_NAME}
   region: ${REGION}
-  version: 1.30
+  version: "1.30"
 
 availabilityZones:
   - ${AVAILABILITY_ZONES}
