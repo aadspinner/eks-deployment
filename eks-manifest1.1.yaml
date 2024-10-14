@@ -28,9 +28,9 @@ managedNodeGroups:
       - t3a.small
       - t3a.medium
       - t3.medium
-    desiredCapacity: $NODE_COUNT
-    minSize: $NODE_COUNT
-    maxSize: $NODE_MAX_SIZE
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 3
     spot: true
     privateNetworking: false
     ssh:
