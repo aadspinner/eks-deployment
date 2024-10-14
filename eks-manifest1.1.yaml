@@ -20,31 +20,4 @@ privateCluster:
   enabled: false
   skipEndpointCreation: false
 
-managedNodeGroups:
-  - name: ${NODEGROUP_NAME}
-    amiFamily: Ubuntu2204
-    instanceTypes:
-      - t3.small
-      - t3a.small
-      - t3a.medium
-      - t3.medium
-    desiredCapacity: 2
-    minSize: 2
-    maxSize: 3
-    spot: true
-    privateNetworking: false
-    ssh:
-      allow: true
-      publicKeyName: ${SSH_PUBLIC_KEY}
-    tags:
-      alpha.eksctl.io/nodegroup-name: ${NODEGROUP_NAME}
-      alpha.eksctl.io/nodegroup-type: managed
-    iam:
-      withAddonPolicies:
-        albIngress: true
-        awsLoadBalancerController: true
-        cloudWatch: true
-    volumeType: gp3
-    volumeSize: 80
-    volumeIOPS: 3000
-    volumeThroughput: 125
+# Remove managedNodeGroups section for initial creation
