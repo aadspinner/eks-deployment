@@ -3,7 +3,7 @@ FROM ubuntu
 # Set environment variables
 ENV AWSCLI_VERSION=2.11.2
 ENV EKSCTL_VERSION=0.140.0
-ENV KUBECTL_VERSION=v1.3.0
+ENV KUBECTL_VERSION=v1.3.1
 
 # Update the package list and install dependencies
 RUN apt-get update && apt-get install -y curl unzip python3 python3-pip
