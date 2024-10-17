@@ -1,3 +1,21 @@
+# cluster-vars.sh
+variables:
+  CLUSTER_NAME: "dev-test2"
+  NODEGROUP_NAME: "spotinstance1"
+  NODE_COUNT: "3"  # GitLab CI treats all variables as strings
+  NODE_MAX_SIZE: "5"
+  REGION: "ap-south-1"
+  AWSCLI_VERSION: "2.11.2"
+  KUBECTL_VERSION: "v1.3.0"
+  SSH_PUBLIC_KEY: "k9"
+  VPC_ID: "vpc-0db13f76ffd134754"
+  SECURITY_GROUP: "sg-05577e05cf426744e"
+  SHARED_SECURITY_GROUP: "sg-0221530a8428624d9"
+  SERVICE_CIDR: "10.100.0.0/16"
+  VPC_CIDR: "10.0.0.0/16"
+  AVAILABILITY_ZONES: "ap-south-1a,ap-south-1b"  # Represented as a comma-separated string
+
+
 image: docker:latest
 services:
   - docker:dind
