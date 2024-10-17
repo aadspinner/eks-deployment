@@ -15,10 +15,16 @@ variables:
   VPC_CIDR: "10.0.0.0/16"
   AVAILABILITY_ZONES: "ap-south-1a,ap-south-1b"  # Represented as a comma-separated string
 
-
 image: docker:latest
 services:
   - docker:dind
+
+# Add the workflow section at the top
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+    - when: never  # Prevents the pipeline from running for any other sources
 
 before_script:
   - docker info
