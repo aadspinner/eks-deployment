@@ -1,48 +1,11 @@
-# cluster-vars.sh
-variables:
-  CLUSTER_NAME: "dev-test2"
-  NODEGROUP_NAME: "spotinstance1"
-  NODE_COUNT: "3"
-  NODE_MAX_SIZE: "5"
-  REGION: "ap-south-1"
-  AWSCLI_VERSION: "2.11.2"
-  KUBECTL_VERSION: "v1.3.0"
-  SSH_PUBLIC_KEY: "k9"
-  VPC_ID: "vpc-0db13f76ffd134754"
-  SECURITY_GROUP: "sg-05577e05cf426744e"
-  SHARED_SECURITY_GROUP: "sg-0221530a8428624d9"
-  SERVICE_CIDR: "10.100.0.0/16"
-  VPC_CIDR: "10.0.0.0/16"
-  AVAILABILITY_ZONES: "ap-south-1a,ap-south-1b"
-image: docker:latest
-services:
-  - docker:dind
-workflow:
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger"'
-    - when: never
-before_script:
-  - docker info
-stages:
-  - build
-  - deploy
-build:
-  stage: build
-  script:
-    - docker build -t ramchdocker/custom-eks-image:latest .
-    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    - docker push ramchdocker/custom-eks-image:latest
-  rules:
-    - changes:
-      - Dockerfile
-      - src/**/*
 deploy:
   stage: deploy
   image: python:3.9-slim
   services:
     - docker:dind
   before_script:
+    - source cluster-vars.sh
+    - export AWS_DEFAULT_REGION=$REGION  # Export REGION properly
     - apt-get update && apt-get install -y curl unzip
     - ARCH=amd64
     - PLATFORM=$(uname -s)_$ARCH
@@ -58,7 +21,7 @@ deploy:
     - chmod +x kubectl
     - mv kubectl /usr/local/bin/
   script:
-    - echo $AWS_DEFAULT_REGION
+    - echo $AWS_DEFAULT_REGION  # Verify the region is set correctly
     - aws sts get-caller-identity
     - eksctl create cluster -f eks-manifest1.1.yaml --without-nodegroup
     - kubectl delete daemonset -n kube-system aws-node
@@ -73,8 +36,3 @@ deploy:
     - kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.35"
     - kubectl apply -f eks-pvc.yaml
     - kubectl apply -f eks-sc-3zones.yaml
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
-    - changes:
-      - eks-manifest1.1.yaml
-      - eks-node-grp1.1.yaml
