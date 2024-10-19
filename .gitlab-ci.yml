@@ -2,7 +2,7 @@
 variables:
   CLUSTER_NAME: "dev-test2"
   NODEGROUP_NAME: "spotinstance1"
-  NODE_COUNT: "3"  # GitLab CI treats all variables as strings
+  NODE_COUNT: "3"
   NODE_MAX_SIZE: "5"
   REGION: "ap-south-1"
   AWSCLI_VERSION: "2.11.2"
@@ -13,26 +13,20 @@ variables:
   SHARED_SECURITY_GROUP: "sg-0221530a8428624d9"
   SERVICE_CIDR: "10.100.0.0/16"
   VPC_CIDR: "10.0.0.0/16"
-  AVAILABILITY_ZONES: "ap-south-1a,ap-south-1b"  # Represented as a comma-separated string
-
+  AVAILABILITY_ZONES: "ap-south-1a,ap-south-1b"
 image: docker:latest
 services:
   - docker:dind
-
-# Add the workflow section at the top
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
     - if: '$CI_PIPELINE_SOURCE == "trigger"'
-    - when: never  # Prevents the pipeline from running for any other sources
-
+    - when: never
 before_script:
   - docker info
-
 stages:
   - build
   - deploy
-
 build:
   stage: build
   script:
@@ -43,7 +37,6 @@ build:
     - changes:
       - Dockerfile
       - src/**/*
-      
 deploy:
   stage: deploy
   image: python:3.9-slim
@@ -58,7 +51,7 @@ deploy:
     - curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
     - tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
     - mv /tmp/eksctl /usr/local/bin
-    - eksctl version  # Verify the install
+    - eksctl version
     - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCLI_VERSION}.zip" -o "awscliv2.zip"
     - unzip awscliv2.zip
     - ./aws/install
@@ -66,6 +59,8 @@ deploy:
     - chmod +x kubectl
     - mv kubectl /usr/local/bin/
   script:
+    - echo $AWS_DEFAULT_REGION
+    - aws sts get-caller-identity
     - eksctl create cluster -f eks-manifest1.1.yaml --without-nodegroup
     - kubectl delete daemonset -n kube-system aws-node
     - kubectl apply -f caliconode.yaml
@@ -79,15 +74,8 @@ deploy:
     - kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.35"
     - kubectl apply -f eks-pvc.yaml
     - kubectl apply -f eks-sc-3zones.yaml
-
-    # - eksctl create cluster --name $CLUSTER_NAME --region $REGION --without-nodegroup
-    # - eksctl update addon --name vpc-cni --cluster $CLUSTER_NAME --region $REGION
-    # - eksctl utils associate-iam-oidc-provider --region $REGION --cluster $CLUSTER_NAME --approve
-    # - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
-    # - kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.2/manifests/tigera-operator.yaml
-    # - kubectl apply -f caliconode.yaml
-    # - eksctl create nodegroup --cluster $CLUSTER_NAME --region $REGION --name $NODEGROUP_NAME --nodes $NODE_COUNT
-    # - eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster $CLUSTER_NAME --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve
-    # - kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.35"
-    # - kubectl apply -f eks-pvc.yaml
-    # - kubectl apply -f eks-sc-3zones.yaml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+    - changes:
+      - eks-manifest1.1.yaml
+      - eks-node-grp1.1.yaml
