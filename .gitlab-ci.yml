@@ -5,7 +5,7 @@ deploy:
     - docker:dind
   before_script:
     - source cluster-vars.sh
-    - export AWS_DEFAULT_REGION=$REGION  # Export REGION properly
+    - export AWS_DEFAULT_REGION=$REGION
     - apt-get update && apt-get install -y curl unzip
     - ARCH=amd64
     - PLATFORM=$(uname -s)_$ARCH
@@ -21,9 +21,10 @@ deploy:
     - chmod +x kubectl
     - mv kubectl /usr/local/bin/
   script:
-    - echo $AWS_DEFAULT_REGION  # Verify the region is set correctly
+    - echo $AWS_DEFAULT_REGION
     - aws sts get-caller-identity
-    - eksctl create cluster -f eks-manifest1.1.yaml --without-nodegroup
+    - envsubst < eks-manifest1.1.yaml > eks-manifest1.1.tmp.yaml
+    - eksctl create cluster -f eks-manifest1.1.tmp.yaml --without-nodegroup
     - kubectl delete daemonset -n kube-system aws-node
     - kubectl apply -f caliconode.yaml
     - eksctl create nodegroup -f eks-node-grp1.1.yaml
