@@ -43,7 +43,6 @@ deploy:
   services:
     - docker:dind
   before_script:
-    - source cluster-vars.sh
     - apt-get update && apt-get install -y curl unzip
     - ARCH=amd64
     - PLATFORM=$(uname -s)_$ARCH
