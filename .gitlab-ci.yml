@@ -1,11 +1,11 @@
 image: docker:latest
 services:
   - docker:dind
-workflow:
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger"'
-    - when: never
+# workflow:
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+#     - if: '$CI_PIPELINE_SOURCE == "trigger"'
+#     - when: never
 before_script:
   - docker info
 stages:
