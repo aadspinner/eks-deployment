@@ -3,7 +3,7 @@ kind: ClusterConfig
 
 metadata:
   name: ${CLUSTER_NAME}
-  region: ap-south-1
+  region: "ap-south-1"
   version: "1.30"
 
 availabilityZones:
