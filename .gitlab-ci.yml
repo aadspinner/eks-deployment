@@ -44,17 +44,17 @@ deploy:
     - mv kubectl /usr/local/bin/
   script:
     - echo $AWS_DEFAULT_REGION
-    - aws sts get-caller-identity
-    - eksctl create cluster -f eks-manifest1.1.yaml --without-nodegroup
-    - kubectl delete daemonset -n kube-system aws-node
-    - kubectl apply -f caliconode.yaml
-    - eksctl create nodegroup -f eks-node-grp1.1.yaml
-    - eksctl update addon --name vpc-cni --cluster $CLUSTER_NAME --region $REGION
-    - eksctl utils associate-iam-oidc-provider --region $REGION --cluster $CLUSTER_NAME --approve
-    - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
-    - kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.2/manifests/tigera-operator.yaml
-    - eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster $CLUSTER_NAME --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve
-    - kubectl apply -f ebs-csi-serviceaccount.yaml
-    - kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.35"
-    - kubectl apply -f eks-pvc.yaml
-    - kubectl apply -f eks-sc-3zones.yaml
+    # - aws sts get-caller-identity
+    # - eksctl create cluster -f eks-manifest1.1.yaml --without-nodegroup
+    # - kubectl delete daemonset -n kube-system aws-node
+    # - kubectl apply -f caliconode.yaml
+    # - eksctl create nodegroup -f eks-node-grp1.1.yaml
+    # - eksctl update addon --name vpc-cni --cluster $CLUSTER_NAME --region $REGION
+    # - eksctl utils associate-iam-oidc-provider --region $REGION --cluster $CLUSTER_NAME --approve
+    # - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
+    # - kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.2/manifests/tigera-operator.yaml
+    # - eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster $CLUSTER_NAME --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve
+    # - kubectl apply -f ebs-csi-serviceaccount.yaml
+    # - kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.35"
+    # - kubectl apply -f eks-pvc.yaml
+    # - kubectl apply -f eks-sc-3zones.yaml
