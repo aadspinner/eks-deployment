@@ -33,6 +33,10 @@ deploy:
     - docker:dind
   
   before_script:
+  - apt-get update && apt-get install -y git
+  - git config --global credential.helper cache
+  - git clone https://github.com/aadspinner/eks-deployment.git
+  - cd eks-deployment
   - source cluster-vars.sh
   - export AWS_DEFAULT_REGION=$REGION  # Correct region export ha
   - apt-get update && apt-get install -y curl unzip
