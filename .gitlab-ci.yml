@@ -50,7 +50,10 @@ deploy:
   - chmod +x kubectl
   - mv kubectl /usr/local/bin/
   script:
-    - echo $AWS_DEFAULT_REGION
+  - source cluster-vars.sh
+  - export AWS_DEFAULT_REGION=$REGION
+  - echo "Region from script:" $REGION
+  
     # - aws sts get-caller-identity
     # - eksctl create cluster -f eks-manifest1.1.yaml --without-nodegroup
     # - kubectl delete daemonset -n kube-system aws-node
