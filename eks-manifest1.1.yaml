@@ -1,15 +1,14 @@
+
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
   name: ${CLUSTER_NAME}
-  region: "ap-south-1"
+  region: ${REGION}
   version: "1.30"
 
 availabilityZones:
-  - ap-south-1a
-  - ap-south-1b
-
+  - ${AVAILABILITY_ZONES}
 iam:
   withOIDC: true
   vpcResourceControllerPolicy: true
@@ -17,5 +16,6 @@ iam:
 privateCluster:
   enabled: false
   skipEndpointCreation: false
+
 
 # Remove managedNodeGroups section for initial creation
