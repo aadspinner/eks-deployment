@@ -8,9 +8,11 @@ services:
 #     - when: never
 before_script:
   - docker info
+
 stages:
   - build
   - deploy
+
 build:
   stage: build
   script:
@@ -21,27 +23,32 @@ build:
     - changes:
       - Dockerfile
       - src/**/*
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH'
+
 deploy:
   stage: deploy
   image: python:3.9-slim
   services:
     - docker:dind
+  
   before_script:
-    - source cluster-vars.sh
-    - apt-get update && apt-get install -y curl unzip
-    - ARCH=amd64
-    - PLATFORM=$(uname -s)_$ARCH
-    - curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
-    - curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
-    - tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
-    - mv /tmp/eksctl /usr/local/bin
-    - eksctl version
-    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCLI_VERSION}.zip" -o "awscliv2.zip"
-    - unzip awscliv2.zip
-    - ./aws/install
-    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    - chmod +x kubectl
-    - mv kubectl /usr/local/bin/
+  - source cluster-vars.sh
+  - export AWS_DEFAULT_REGION=$REGION  # Correct region export
+  - apt-get update && apt-get install -y curl unzip
+  - ARCH=amd64
+  - PLATFORM=$(uname -s)_$ARCH
+  - curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+  - curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
+  - tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+  - mv /tmp/eksctl /usr/local/bin
+  - eksctl version
+  - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCLI_VERSION}.zip" -o "awscliv2.zip"
+  - unzip awscliv2.zip
+  - ./aws/install
+  - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  - chmod +x kubectl
+  - mv kubectl /usr/local/bin/
   script:
     - echo $AWS_DEFAULT_REGION
     # - aws sts get-caller-identity
